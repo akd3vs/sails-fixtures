@@ -1,0 +1,22 @@
+{
+    "name" : "sails-fixtures",
+    "description": "Fixtures for Sails.js",
+    "author": {
+        "name": "André Karell",
+        "email": "akd3vs@gmail.com"
+    },
+    "main" : "./index.js",
+    "version": "0.0.1",
+    "private": false,
+    "dependencies": {
+        "glob": "3.x",
+        "async": "0.2.x"
+    },
+    "engines": {
+        "node": "*"
+    },
+    "repository" : {
+        "type" : "git",
+        "url" : "https://github.com/akd3vs/sails-fixtures.git"
+    }
+}
