@@ -28,7 +28,7 @@ Obviusly you can specify the directory where to search. You can, even make an ap
 ### Fixture structure
 ---
 ``` javascript
-var queue = []
+var fixtures = require('sails-fixtures')
     , contacts = [
         {
             name: 'Creatika'
@@ -36,25 +36,60 @@ var queue = []
     ]
 ;
 
-queue.push(function(asynccbParent){
-    Contact.destroy({}).done(function(errDestroy){
-        if(errDestroy) console.log(errDestroy);
-        asynccbParent(null, null); // just for fun
+module.exports.getQueue = function(cb) {
+    fixtures.queue({
+        queue: contacts,
+        model: Contact
+    }, function(queue) {
+        cb(queue);
     });
-});
-contacts.forEach(function(contact){
-    queue.push(function(asynccb){
-        Contact.create(contact).done(function(err, contactObj){
-            if(err) throw err;
-            asynccb(null, contactObj);
-        });
-    });
-});
-
-module.exports = queue;
+};
 ```
-It is just an example, you can customize everything. Sorry for using async, but I did not find anything better to make async calls without looking to dirty.
+## Unions
+---
 
-The logic is:
+``` javascript
+var fixtures = require('sails-fixtures')
+    , contacts = [
+         {
+             name: 'andre',
+             lastName: 'contreras',
+             fullName: ''
+         }, {
+             name: 'andre2',
+             lastName: 'contreras2',
+             fullName: '',
+             $$union: [
+                 {
+                     modelName: 'modelUser',
+                     q: [{
+                         name: 'andre'
+                     }],
+                     fields: [
+                         ['fullName','name']
+                     ]
+                 }
+             ]
+         }
+    ]
+;
 
-I'm getting the contacts from the variable, you can obtain these from a DB for example (ironic), or from a file, then empty the collection Contact. In the second queue in this fixture, I'm creating the contacts pushing into the queue.
+module.exports.getQueue = function(cb) {
+    fixtures.queue({
+        queue: contacts,
+        model: Contact,
+        modelUser: User
+    }, function(queue) {
+        cb(queue);
+    });
+};
+```
+
+This feature is in development, it will get more features like more fields to concatenate, better handle of the models, and data, etc.
+
+The union it is specified in the key $$union. The modelName is the custom key in fixtures.queue();, if you look at it
+itt will be a "modelUser" and in modelName there is a "modelUser".
+
+The key "q" is to specify the query that will get the entry that we will get the fields.
+This relation it is specify in the key fields. The field fullName of the entry that we get with the query "q"
+we put in the name field of the current fixture.
